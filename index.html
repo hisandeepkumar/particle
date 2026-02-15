@@ -3,398 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Terabox Player · paste & play</title>
-    <!-- minimal styles, no extra features -->
+    <title>Terabox Player · Frontend Only</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
         body {
-            background: #f4f6fa;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 16px;
+            font-family: system-ui, sans-serif;
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+            background: #f5f7fb;
         }
-        .player-card {
-            max-width: 780px;
-            width: 100%;
+        .container {
             background: white;
             border-radius: 24px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
-            padding: 28px 24px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
         h1 {
-            font-size: 1.9rem;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            color: #0b0f18;
-            margin-bottom: 6px;
+            margin-top: 0;
+            color: #1e293b;
+            font-size: 1.8rem;
         }
-        .sub {
-            color: #3f4551;
-            margin-bottom: 24px;
-            font-size: 1rem;
-            border-left: 4px solid #2a7de1;
-            padding-left: 16px;
-            background: #f0f4fe;
-            border-radius: 0 12px 12px 0;
-            line-height: 1.4;
-        }
-        .search-area {
+        .input-group {
             display: flex;
-            flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
-        #searchInput {
-            flex: 1 1 260px;
+        #linkInput {
+            flex: 1;
             padding: 14px 18px;
-            border: 1px solid #d9dfeb;
-            border-radius: 60px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
             font-size: 1rem;
             outline: none;
-            background: white;
-            transition: 0.15s;
         }
-        #searchInput:focus {
-            border-color: #1d4ed8;
-            box-shadow: 0 0 0 3px rgba(29,78,216,0.15);
+        #linkInput:focus {
+            border-color: #3b82f6;
         }
-        .btn {
-            background: white;
-            border: 1px solid #cbd5e1;
-            padding: 0 22px;
-            border-radius: 60px;
-            font-weight: 500;
-            font-size: 0.95rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.1s;
-            color: #1e293b;
-        }
-        .btn-primary {
-            background: #1d4ed8;
-            border: 1px solid #1d4ed8;
+        button {
+            background: #3b82f6;
             color: white;
-            box-shadow: 0 4px 8px rgba(29,78,216,0.2);
+            border: none;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-        .btn-primary:hover {
-            background: #1e3fb0;
-            border-color: #1e3fb0;
+        button:hover {
+            background: #2563eb;
         }
-        .btn:hover {
-            background: #f1f5f9;
+        .status {
+            margin: 20px 0;
+            padding: 12px;
+            border-radius: 12px;
+            background: #f8fafc;
+            color: #334155;
+            display: none;
         }
-        .btn-primary:hover {
-            background: #1e3fb0;
-        }
-        .error {
+        .status.error {
             background: #fee2e2;
             color: #b91c1c;
-            border-radius: 40px;
-            padding: 10px 18px;
-            font-size: 0.95rem;
-            margin: 16px 0 8px;
-            display: none;
-            border: 1px solid #fecaca;
         }
-        .loading {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 24px 0 10px;
-            color: #2d3748;
+        .status.success {
+            background: #dcfce7;
+            color: #166534;
         }
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid #e2e8f0;
-            border-top: 3px solid #1d4ed8;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .video-container {
-            margin-top: 24px;
+        .video-wrapper {
+            margin-top: 25px;
             border-radius: 20px;
             overflow: hidden;
-            background: #0b0f18;
+            background: #0f172a;
+            display: none;
         }
         video {
             width: 100%;
             display: block;
-            background: black;
         }
-        .video-info {
-            padding: 18px 16px;
-            background: #ffffff;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            border: 1px solid #edf2f7;
-            border-top: none;
+        .info {
+            padding: 16px;
+            background: white;
         }
-        .video-info h3 {
-            font-weight: 600;
-            font-size: 1.2rem;
-            margin-bottom: 8px;
+        .info h3 {
+            margin: 0 0 8px 0;
             color: #0f172a;
-            word-break: break-word;
         }
-        .meta-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 24px;
+        .info p {
+            margin: 0;
             color: #475569;
             font-size: 0.9rem;
         }
-        .meta-row i {
-            margin-right: 4px;
-            opacity: 0.8;
-        }
-        /* hide everything extra — no ads, no footer, no related */
-        .no-extra {
-            /* nothing */
-        }
         .note {
+            margin-top: 20px;
             font-size: 0.85rem;
             color: #64748b;
-            margin-top: 16px;
             text-align: center;
-            border-top: 1px dashed #cbd5e1;
-            padding-top: 16px;
         }
-        button i { font-size: 1rem; }
-        /* font awesome free via cdn (only used for icons) */
     </style>
-    <!-- Font Awesome (only for paste & search icons, minimal) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-<div class="player-card">
-    <h1>🎬 terabox · paste & play</h1>
-    <div class="sub">no login · no ads · just paste link and watch</div>
+    <div class="container">
+        <h1>🎬 Terabox Player · Educational Purpose Only</h1>
+        <p>Paste any Terabox link (teraboxapp.com, 1024terabox.com, etc.) and watch instantly.</p>
+        
+        <div class="input-group">
+            <input type="text" id="linkInput" placeholder="https://teraboxapp.com/..." value="">
+            <button onclick="fetchAndPlay()">Play Video</button>
+        </div>
 
-    <!-- search row -->
-    <div class="search-area">
-        <input type="text" id="searchInput" placeholder="Paste Terabox link (teraboxapp.com, 1024terabox.com, ...)" value="">
-        <button class="btn" onclick="pasteFromClipboard()"><i class="fas fa-paste"></i> Paste</button>
-        <button class="btn btn-primary" onclick="searchVideo()"><i class="fas fa-search"></i> Search</button>
+        <div class="status" id="statusMessage"></div>
+        
+        <div class="video-wrapper" id="videoWrapper">
+            <video id="videoPlayer" controls playsinline></video>
+            <div class="info">
+                <h3 id="videoTitle">Loading...</h3>
+                <p id="videoSize"></p>
+            </div>
+        </div>
+        
+        <div class="note">
+            ⚡ Uses public CORS proxy — for educational use only.<br>
+            Video loads directly from TeraBox CDN.
+        </div>
     </div>
 
-    <!-- error / loading -->
-    <div class="error" id="errorMessage"></div>
-    <div class="loading" id="loadingIndicator" style="display: none;">
-        <div class="spinner"></div> fetching video...
-    </div>
+    <script>
+        // Public CORS proxy (no signup required)
+        const CORS_PROXY = 'https://thingproxy.freeboard.io/fetch/';
+        
+        // API endpoint (from flowvideoplayer.com)
+        const API_URL = 'https://flowvideoplayer.com/telegram/bot/search/video';
+        
+        // Headers required by the API
+        const HEADERS = {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': 'fyCebxjwGNV8HiL1rrkZvA39QuiEDJgIkjjvqF0H',
+            'app-secret-key': 'c43457c1b44eecde1ee0e447c963b8b3837054767fdce47e045044cbc8d665b6'
+        };
 
-    <!-- video output area (initially empty) -->
-    <div id="videoContainer" class="video-container"></div>
-
-    <!-- tiny note: exactly the same engine as flowvideoplayer -->
-    <div class="note">⚡ same backend as Flow Video Player · works with any Terabox link</div>
-</div>
-
-<!-- HLS.js for m3u8 streams -->
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
-<script>
-    (function() {
-        // ---------- core variables ----------
-        let activeHls = null;
-
-        // ---------- helpers ----------
-        async function pasteFromClipboard() {
-            try {
-                const text = await navigator.clipboard.readText();
-                if (text && text.trim()) {
-                    document.getElementById('searchInput').value = text.trim();
-                }
-            } catch (e) {
-                showError('Cannot read clipboard. Paste manually or allow permission.');
-            }
+        function setStatus(msg, isError = false) {
+            const status = document.getElementById('statusMessage');
+            status.style.display = 'block';
+            status.className = 'status ' + (isError ? 'error' : 'success');
+            status.textContent = msg;
         }
 
-        function showError(msg) {
-            const el = document.getElementById('errorMessage');
-            el.textContent = msg;
-            el.style.display = 'block';
-            setTimeout(() => { el.style.display = 'none'; }, 4500);
-        }
-
-        function showLoading() {
-            document.getElementById('loadingIndicator').style.display = 'flex';
-        }
-
-        function hideLoading() {
-            document.getElementById('loadingIndicator').style.display = 'none';
-        }
-
-        // ---------- main search function (exactly same API as original) ----------
-        async function searchVideo() {
-            const input = document.getElementById('searchInput');
-            const url = input.value.trim();
-            if (!url) {
-                showError('Please paste a Terabox video URL');
+        async function fetchAndPlay() {
+            const link = document.getElementById('linkInput').value.trim();
+            if (!link) {
+                setStatus('❌ Please paste a Terabox link', true);
                 return;
             }
 
-            showLoading();
-            // hide any previous video
-            const container = document.getElementById('videoContainer');
-            container.innerHTML = '';
+            // Hide previous video
+            document.getElementById('videoWrapper').style.display = 'none';
+            setStatus('⏳ Fetching video info...');
 
             try {
-                const res = await fetch('https://flowvideoplayer.com/telegram/bot/search/video', {
+                // Make request via CORS proxy
+                const response = await fetch(CORS_PROXY + API_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': 'fyCebxjwGNV8HiL1rrkZvA39QuiEDJgIkjjvqF0H',
-                        'app-secret-key': 'c43457c1b44eecde1ee0e447c963b8b3837054767fdce47e045044cbc8d665b6'
-                    },
-                    body: JSON.stringify({ url })
+                    headers: HEADERS,
+                    body: JSON.stringify({ url: link })
                 });
 
-                const data = await res.json();
-                hideLoading();
+                // The proxy returns the raw response, but sometimes it wraps it.
+                // We need to handle possible text/plain response.
+                const text = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    setStatus('❌ Invalid response from server. Try again later.', true);
+                    return;
+                }
 
                 if (!data || data.error) {
-                    showError(data?.message || 'Unable to fetch video. Check link or try again.');
+                    setStatus('❌ ' + (data.message || 'Unable to fetch video. Check link.'), true);
                     return;
                 }
 
-                // response structure: { data: [video object] or array of videos }
-                let videoItem = null;
+                // Handle both single video and array
+                let videoItem;
                 if (Array.isArray(data.data)) {
                     if (data.data.length === 0) {
-                        showError('No video found at this link.');
+                        setStatus('❌ No videos found at this link.', true);
                         return;
                     }
-                    // SIMPLE: just take the first video, ignore related grid (no extra UI)
-                    videoItem = data.data[0];
+                    videoItem = data.data[0]; // take first video
                 } else {
-                    videoItem = data.data; // single object
+                    videoItem = data.data;
                 }
 
-                if (!videoItem) {
-                    showError('Invalid response from server.');
-                    return;
-                }
-
-                // extract stream URL (support both stream_final_url and stream_url)
                 const streamUrl = videoItem.stream_final_url || videoItem.stream_url;
                 if (!streamUrl) {
-                    showError('No playable stream found.');
+                    setStatus('❌ No playable stream found.', true);
                     return;
                 }
 
-                // display video player with info
-                displayVideo(streamUrl, videoItem.file_name || 'Terabox video', videoItem.file_size || 'unknown');
+                // Display video
+                const video = document.getElementById('videoPlayer');
+                video.src = streamUrl;
+                
+                document.getElementById('videoTitle').textContent = videoItem.file_name || 'Untitled';
+                document.getElementById('videoSize').textContent = 'Size: ' + (videoItem.file_size || 'Unknown');
+                
+                document.getElementById('videoWrapper').style.display = 'block';
+                setStatus('✅ Video ready! Playing...');
+                
+                video.play().catch(e => {
+                    // Autoplay may be blocked, but user can click play
+                });
 
-                // clear input if you like (optional)
-                // input.value = '';  // (keeping it, but can be left as is)
+            } catch (error) {
+                setStatus('❌ Network error: ' + error.message, true);
+            }
+        }
 
+        // Optional: paste from clipboard
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('linkInput').value = text;
+                fetchAndPlay();
             } catch (e) {
-                hideLoading();
-                showError('Network error or server unreachable.');
-                console.warn(e);
+                setStatus('❌ Cannot paste from clipboard', true);
             }
         }
 
-        // ---------- render video player (no download buttons, no extra fluff) ----------
-        function displayVideo(url, title, size) {
-            const container = document.getElementById('videoContainer');
-            // clean up any previous hls instance
-            if (activeHls) {
-                activeHls.destroy();
-                activeHls = null;
-            }
+        // Add a paste button (optional) — uncomment if you want
+        // But we already have one in the UI? No, but we can add a small button.
+        // I'll add a small paste icon button next to input for convenience.
+    </script>
 
-            const videoId = 'simple-player-' + Date.now(); // unique but we only have one
-
-            const html = `
-                <div class="video-item">
-                    <video id="${videoId}" controls playsinline style="width:100%; background:#000;"></video>
-                    <div class="video-info">
-                        <h3>${escapeHtml(title)}</h3>
-                        <div class="meta-row">
-                            <span><i class="fas fa-cloud"></i> size: ${escapeHtml(size)}</span>
-                            <span id="duration-${videoId}"><i class="far fa-clock"></i> duration: —</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            container.innerHTML = html;
-
-            const videoElement = document.getElementById(videoId);
-            if (!videoElement) return;
-
-            // If HLS supported
-            if (Hls.isSupported()) {
-                const hls = new Hls({
-                    enableWorker: true,
-                    lowLatencyMode: false,
-                    maxBufferLength: 60,
-                    backBufferLength: 20,
-                    maxBufferHole: 0.5,
-                    maxSeekHole: 2
-                });
-                activeHls = hls;
-                hls.loadSource(url);
-                hls.attachMedia(videoElement);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    videoElement.play().catch(() => {}); // autoplay may be blocked, but fine
-                });
-                hls.on(Hls.Events.ERROR, (err, data) => {
-                    // silent fail (already handled by video element fallback)
-                });
-            } 
-            // fallback for Safari / native HLS
-            else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-                videoElement.src = url;
-                videoElement.play().catch(() => {});
-            } 
-            else {
-                // last resort: try to load as plain video
-                videoElement.src = url;
-            }
-
-            // update duration when metadata loaded
-            videoElement.addEventListener('loadedmetadata', () => {
-                const d = videoElement.duration;
-                if (!isNaN(d)) {
-                    const mins = Math.floor(d / 60);
-                    const secs = Math.floor(d % 60).toString().padStart(2, '0');
-                    const durSpan = document.getElementById(`duration-${videoId}`);
-                    if (durSpan) durSpan.innerHTML = `<i class="far fa-clock"></i> duration: ${mins}:${secs}`;
-                }
-            });
-        }
-
-        // tiny helper to escape text (prevent XSS from filenames)
-        function escapeHtml(unsafe) {
-            if (!unsafe) return '';
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        // expose functions globally for onclick
-        window.pasteFromClipboard = pasteFromClipboard;
-        window.searchVideo = searchVideo;
-    })();
-</script>
-
-<!-- no extra sections, no ads, no related, no footer — exactly as requested: simple paste & play -->
+    <!-- Optional: add a small paste button -->
+    <div style="text-align: right; margin-top: 10px;">
+        <button onclick="pasteFromClipboard()" style="background: #64748b; padding: 8px 16px;">📋 Paste Link</button>
+    </div>
 </body>
 </html>
