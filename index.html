@@ -3,242 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terabox Player · Frontend Only</title>
+    <title>Terabox Player · Working</title>
     <style>
+        * { box-sizing: border-box; margin: 0; }
         body {
-            font-family: system-ui, sans-serif;
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 0 20px;
-            background: #f5f7fb;
+            background: linear-gradient(145deg, #0d0f14, #141826);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
         }
-        .container {
-            background: white;
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        .glass-card {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(20, 25, 35, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 40px;
+            padding: 35px 30px;
+            box-shadow: 0 30px 50px rgba(0,0,0,0.5);
+            color: white;
         }
         h1 {
-            margin-top: 0;
-            color: #1e293b;
-            font-size: 1.8rem;
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .sub {
+            color: #9ca3af;
+            margin-bottom: 30px;
+            font-size: 1rem;
+            border-left: 4px solid #3b82f6;
+            padding-left: 16px;
         }
         .input-group {
             display: flex;
-            gap: 10px;
             flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
         }
         #linkInput {
             flex: 1;
-            padding: 14px 18px;
-            border: 2px solid #e2e8f0;
-            border-radius: 50px;
+            padding: 16px 22px;
+            border: 2px solid #2d3748;
+            border-radius: 60px;
+            background: #1e2533;
+            color: white;
             font-size: 1rem;
             outline: none;
+            transition: 0.2s;
         }
         #linkInput:focus {
             border-color: #3b82f6;
+            background: #252f3f;
+        }
+        #linkInput::placeholder {
+            color: #6b7280;
         }
         button {
             background: #3b82f6;
             color: white;
             border: none;
-            padding: 14px 28px;
-            border-radius: 50px;
-            font-size: 1rem;
+            padding: 0 30px;
+            border-radius: 60px;
             font-weight: 600;
+            font-size: 1rem;
             cursor: pointer;
-            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+            border: 2px solid #3b82f6;
         }
         button:hover {
             background: #2563eb;
+            border-color: #2563eb;
+        }
+        .paste-btn {
+            background: #2d3748;
+            border: 2px solid #4b5563;
+        }
+        .paste-btn:hover {
+            background: #374151;
         }
         .status {
+            padding: 14px 20px;
+            border-radius: 40px;
             margin: 20px 0;
-            padding: 12px;
-            border-radius: 12px;
-            background: #f8fafc;
-            color: #334155;
             display: none;
+            font-weight: 500;
+            background: #1e2a3a;
+            border-left: 4px solid;
+        }
+        .status.info {
+            border-color: #3b82f6;
+            color: #bfdbfe;
         }
         .status.error {
-            background: #fee2e2;
-            color: #b91c1c;
+            border-color: #ef4444;
+            color: #fecaca;
         }
         .status.success {
-            background: #dcfce7;
-            color: #166534;
+            border-color: #10b981;
+            color: #a7f3d0;
         }
         .video-wrapper {
-            margin-top: 25px;
-            border-radius: 20px;
+            background: #0b111e;
+            border-radius: 28px;
             overflow: hidden;
-            background: #0f172a;
+            margin-top: 25px;
+            border: 1px solid #2d3748;
             display: none;
         }
         video {
             width: 100%;
             display: block;
+            background: black;
         }
-        .info {
-            padding: 16px;
-            background: white;
+        .video-info {
+            padding: 20px;
+            background: #111827;
         }
-        .info h3 {
-            margin: 0 0 8px 0;
-            color: #0f172a;
+        .video-info h3 {
+            color: white;
+            margin-bottom: 6px;
         }
-        .info p {
-            margin: 0;
-            color: #475569;
+        .video-info p {
+            color: #9ca3af;
             font-size: 0.9rem;
         }
         .note {
-            margin-top: 20px;
-            font-size: 0.85rem;
-            color: #64748b;
+            margin-top: 25px;
+            color: #6b7280;
+            font-size: 0.8rem;
             text-align: center;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎬 Terabox Player · Educational Purpose Only</h1>
-        <p>Paste any Terabox link (teraboxapp.com, 1024terabox.com, etc.) and watch instantly.</p>
-        
-        <div class="input-group">
-            <input type="text" id="linkInput" placeholder="https://teraboxapp.com/..." value="">
-            <button onclick="fetchAndPlay()">Play Video</button>
-        </div>
+<div class="glass-card">
+    <h1>✨ Terabox · Direct Player</h1>
+    <div class="sub">Paste any Terabox link → watch instantly (no login, no ads)</div>
 
-        <div class="status" id="statusMessage"></div>
-        
-        <div class="video-wrapper" id="videoWrapper">
-            <video id="videoPlayer" controls playsinline></video>
-            <div class="info">
-                <h3 id="videoTitle">Loading...</h3>
-                <p id="videoSize"></p>
-            </div>
-        </div>
-        
-        <div class="note">
-            ⚡ Uses public CORS proxy — for educational use only.<br>
-            Video loads directly from TeraBox CDN.
+    <div class="input-group">
+        <input type="text" id="linkInput" placeholder="https://teraboxapp.com/s/1...">
+        <button class="paste-btn" onclick="pasteFromClipboard()"><span>📋</span> Paste</button>
+        <button onclick="fetchAndPlay()"><span>▶</span> Play</button>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <div id="videoWrapper" class="video-wrapper">
+        <video id="videoPlayer" controls playsinline></video>
+        <div class="video-info">
+            <h3 id="videoTitle">—</h3>
+            <p id="videoMeta"></p>
         </div>
     </div>
 
-    <script>
-        // Public CORS proxy (no signup required)
-        const CORS_PROXY = 'https://thingproxy.freeboard.io/fetch/';
-        
-        // API endpoint (from flowvideoplayer.com)
-        const API_URL = 'https://flowvideoplayer.com/telegram/bot/search/video';
-        
-        // Headers required by the API
-        const HEADERS = {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': 'fyCebxjwGNV8HiL1rrkZvA39QuiEDJgIkjjvqF0H',
-            'app-secret-key': 'c43457c1b44eecde1ee0e447c963b8b3837054767fdce47e045044cbc8d665b6'
-        };
+    <div class="note">
+        ⚡ Using reliable CORS proxies · for educational purpose only
+    </div>
+</div>
 
-        function setStatus(msg, isError = false) {
-            const status = document.getElementById('statusMessage');
-            status.style.display = 'block';
-            status.className = 'status ' + (isError ? 'error' : 'success');
-            status.textContent = msg;
+<script>
+    // 🔁 Reliable proxies that support POST + CORS preflight
+    const PROXIES = [
+        'https://corsproxy.io/?',
+        'https://api.codetabs.com/v1/proxy/?quest='
+    ];
+
+    const API_URL = 'https://flowvideoplayer.com/telegram/bot/search/video';
+    const HEADERS = {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': 'fyCebxjwGNV8HiL1rrkZvA39QuiEDJgIkjjvqF0H',
+        'app-secret-key': 'c43457c1b44eecde1ee0e447c963b8b3837054767fdce47e045044cbc8d665b6'
+    };
+
+    let currentProxyIndex = 0;
+
+    function setStatus(msg, type = 'info') {
+        const el = document.getElementById('status');
+        el.className = 'status ' + type;
+        el.textContent = msg;
+        el.style.display = 'block';
+    }
+
+    async function fetchWithProxy(url, options, attempt = 0) {
+        if (attempt >= PROXIES.length) {
+            throw new Error('All proxies failed. Try again later.');
         }
 
-        async function fetchAndPlay() {
-            const link = document.getElementById('linkInput').value.trim();
-            if (!link) {
-                setStatus('❌ Please paste a Terabox link', true);
+        const proxy = PROXIES[attempt];
+        // Some proxies need the target URL encoded, others don't.
+        // corsproxy.io works with encoded or not, but better encode.
+        const fullUrl = proxy + encodeURIComponent(url);
+        
+        try {
+            setStatus(`🔄 Trying proxy ${attempt + 1}/${PROXIES.length}...`);
+            const response = await fetch(fullUrl, options);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response;
+        } catch (error) {
+            console.warn(`Proxy ${attempt + 1} failed:`, error);
+            return fetchWithProxy(url, options, attempt + 1);
+        }
+    }
+
+    async function fetchAndPlay() {
+        const link = document.getElementById('linkInput').value.trim();
+        if (!link) {
+            setStatus('❌ Please paste a Terabox link', 'error');
+            return;
+        }
+
+        document.getElementById('videoWrapper').style.display = 'none';
+        setStatus('⏳ Fetching video info...', 'info');
+
+        try {
+            // 1. Get video metadata via proxy
+            const response = await fetchWithProxy(API_URL, {
+                method: 'POST',
+                headers: HEADERS,
+                body: JSON.stringify({ url: link })
+            });
+
+            const text = await response.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                setStatus('❌ Server returned invalid JSON', 'error');
                 return;
             }
 
-            // Hide previous video
-            document.getElementById('videoWrapper').style.display = 'none';
-            setStatus('⏳ Fetching video info...');
-
-            try {
-                // Make request via CORS proxy
-                const response = await fetch(CORS_PROXY + API_URL, {
-                    method: 'POST',
-                    headers: HEADERS,
-                    body: JSON.stringify({ url: link })
-                });
-
-                // The proxy returns the raw response, but sometimes it wraps it.
-                // We need to handle possible text/plain response.
-                const text = await response.text();
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch (e) {
-                    setStatus('❌ Invalid response from server. Try again later.', true);
-                    return;
-                }
-
-                if (!data || data.error) {
-                    setStatus('❌ ' + (data.message || 'Unable to fetch video. Check link.'), true);
-                    return;
-                }
-
-                // Handle both single video and array
-                let videoItem;
-                if (Array.isArray(data.data)) {
-                    if (data.data.length === 0) {
-                        setStatus('❌ No videos found at this link.', true);
-                        return;
-                    }
-                    videoItem = data.data[0]; // take first video
-                } else {
-                    videoItem = data.data;
-                }
-
-                const streamUrl = videoItem.stream_final_url || videoItem.stream_url;
-                if (!streamUrl) {
-                    setStatus('❌ No playable stream found.', true);
-                    return;
-                }
-
-                // Display video
-                const video = document.getElementById('videoPlayer');
-                video.src = streamUrl;
-                
-                document.getElementById('videoTitle').textContent = videoItem.file_name || 'Untitled';
-                document.getElementById('videoSize').textContent = 'Size: ' + (videoItem.file_size || 'Unknown');
-                
-                document.getElementById('videoWrapper').style.display = 'block';
-                setStatus('✅ Video ready! Playing...');
-                
-                video.play().catch(e => {
-                    // Autoplay may be blocked, but user can click play
-                });
-
-            } catch (error) {
-                setStatus('❌ Network error: ' + error.message, true);
+            if (!data || data.error) {
+                setStatus('❌ ' + (data.message || 'API error'), 'error');
+                return;
             }
-        }
 
-        // Optional: paste from clipboard
-        async function pasteFromClipboard() {
-            try {
-                const text = await navigator.clipboard.readText();
-                document.getElementById('linkInput').value = text;
-                fetchAndPlay();
-            } catch (e) {
-                setStatus('❌ Cannot paste from clipboard', true);
+            // 2. Extract video stream URL
+            let videoItem;
+            if (Array.isArray(data.data)) {
+                if (data.data.length === 0) throw new Error('No videos');
+                videoItem = data.data[0];
+            } else {
+                videoItem = data.data;
             }
+
+            const streamUrl = videoItem.stream_final_url || videoItem.stream_url;
+            if (!streamUrl) throw new Error('No stream URL');
+
+            // 3. Play video (this URL already has CORS enabled, so no proxy needed)
+            const video = document.getElementById('videoPlayer');
+            video.src = streamUrl;
+            
+            document.getElementById('videoTitle').textContent = videoItem.file_name || 'Terabox video';
+            document.getElementById('videoMeta').textContent = 
+                `Size: ${videoItem.file_size || 'unknown'}`;
+            
+            document.getElementById('videoWrapper').style.display = 'block';
+            setStatus('✅ Video ready!', 'success');
+            
+            video.play().catch(() => {}); // autoplay may be blocked
+
+        } catch (error) {
+            setStatus('❌ Network error: ' + error.message, 'error');
         }
+    }
 
-        // Add a paste button (optional) — uncomment if you want
-        // But we already have one in the UI? No, but we can add a small button.
-        // I'll add a small paste icon button next to input for convenience.
-    </script>
-
-    <!-- Optional: add a small paste button -->
-    <div style="text-align: right; margin-top: 10px;">
-        <button onclick="pasteFromClipboard()" style="background: #64748b; padding: 8px 16px;">📋 Paste Link</button>
-    </div>
+    async function pasteFromClipboard() {
+        try {
+            const text = await navigator.clipboard.readText();
+            document.getElementById('linkInput').value = text;
+            fetchAndPlay();
+        } catch (e) {
+            setStatus('❌ Cannot read clipboard', 'error');
+        }
+    }
+</script>
 </body>
 </html>
