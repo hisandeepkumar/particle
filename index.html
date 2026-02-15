@@ -3,695 +3,398 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gesture-Controlled 3D Particle System</title>
+    <title>Simple Terabox Player · paste & play</title>
+    <!-- minimal styles, no extra features -->
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
-        
         body {
-            overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #000;
-            color: #fff;
+            background: #f4f6fa;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 16px;
         }
-        
-        #container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-        }
-        
-        #webcam {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 200px;
-            height: 150px;
-            border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            z-index: 100;
-            transform: scaleX(-1);
-        }
-        
-        #ui {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border-radius: 15px;
-            max-width: 300px;
-            backdrop-filter: blur(10px);
-        }
-        
-        h1 {
-            font-size: 24px;
-            margin-bottom: 15px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .control-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #aaa;
-            font-size: 14px;
-        }
-        
-        select, button {
+        .player-card {
+            max-width: 780px;
             width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            margin-bottom: 10px;
-            cursor: pointer;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+            padding: 28px 24px;
         }
-        
-        button {
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            font-weight: bold;
-            transition: transform 0.2s;
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #0b0f18;
+            margin-bottom: 6px;
         }
-        
-        button:hover {
-            transform: scale(1.05);
-        }
-        
-        .gesture-info {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        #gestureStatus {
-            color: #4ecdc4;
-            font-weight: bold;
-        }
-        
-        .particle-count {
-            font-size: 12px;
-            color: #888;
-            margin-top: 5px;
-        }
-        
-        #loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 30px;
-            border-radius: 15px;
-        }
-        
-        .spinner {
-            border: 5px solid rgba(255, 255, 255, 0.1);
-            border-top: 5px solid #4ecdc4;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .template-buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-        
-        .template-btn {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .template-btn.active {
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            color: white;
-        }
-        
-        .instruction {
-            font-size: 12px;
-            color: #888;
-            margin-top: 15px;
+        .sub {
+            color: #3f4551;
+            margin-bottom: 24px;
+            font-size: 1rem;
+            border-left: 4px solid #2a7de1;
+            padding-left: 16px;
+            background: #f0f4fe;
+            border-radius: 0 12px 12px 0;
             line-height: 1.4;
         }
+        .search-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #searchInput {
+            flex: 1 1 260px;
+            padding: 14px 18px;
+            border: 1px solid #d9dfeb;
+            border-radius: 60px;
+            font-size: 1rem;
+            outline: none;
+            background: white;
+            transition: 0.15s;
+        }
+        #searchInput:focus {
+            border-color: #1d4ed8;
+            box-shadow: 0 0 0 3px rgba(29,78,216,0.15);
+        }
+        .btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 0 22px;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.1s;
+            color: #1e293b;
+        }
+        .btn-primary {
+            background: #1d4ed8;
+            border: 1px solid #1d4ed8;
+            color: white;
+            box-shadow: 0 4px 8px rgba(29,78,216,0.2);
+        }
+        .btn-primary:hover {
+            background: #1e3fb0;
+            border-color: #1e3fb0;
+        }
+        .btn:hover {
+            background: #f1f5f9;
+        }
+        .btn-primary:hover {
+            background: #1e3fb0;
+        }
+        .error {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 40px;
+            padding: 10px 18px;
+            font-size: 0.95rem;
+            margin: 16px 0 8px;
+            display: none;
+            border: 1px solid #fecaca;
+        }
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0 10px;
+            color: #2d3748;
+        }
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #1d4ed8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .video-container {
+            margin-top: 24px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #0b0f18;
+        }
+        video {
+            width: 100%;
+            display: block;
+            background: black;
+        }
+        .video-info {
+            padding: 18px 16px;
+            background: #ffffff;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            border: 1px solid #edf2f7;
+            border-top: none;
+        }
+        .video-info h3 {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: #0f172a;
+            word-break: break-word;
+        }
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+        .meta-row i {
+            margin-right: 4px;
+            opacity: 0.8;
+        }
+        /* hide everything extra — no ads, no footer, no related */
+        .no-extra {
+            /* nothing */
+        }
+        .note {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 16px;
+            text-align: center;
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 16px;
+        }
+        button i { font-size: 1rem; }
+        /* font awesome free via cdn (only used for icons) */
     </style>
+    <!-- Font Awesome (only for paste & search icons, minimal) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div id="container">
-        <canvas id="threeCanvas"></canvas>
-        <video id="webcam" autoplay playsinline></video>
-        <div id="ui">
-            <h1>Gesture Particle System</h1>
-            
-            <div class="control-group">
-                <label>Particle Template:</label>
-                <div class="template-buttons">
-                    <div class="template-btn active" data-template="fireworks">🎆 Fireworks</div>
-                    <div class="template-btn" data-template="heart">❤️ Heart</div>
-                    <div class="template-btn" data-template="flower">🌺 Flower</div>
-                    <div class="template-btn" data-template="saturn">🪐 Saturn</div>
-                    <div class="template-btn" data-template="galaxy">🌌 Galaxy</div>
-                    <div class="template-btn" data-template="vortex">🌀 Vortex</div>
-                </div>
-            </div>
-            
-            <div class="control-group">
-                <label>Control Mode:</label>
-                <select id="controlMode">
-                    <option value="position">Hand Position</option>
-                    <option value="gesture">Specific Gestures</option>
-                </select>
-            </div>
-            
-            <button id="resetBtn">Reset Particles</button>
-            
-            <div class="gesture-info">
-                <div>Current Gesture: <span id="gestureStatus">Detecting...</span></div>
-                <div class="particle-count">Particles: <span id="particleCount">0</span></div>
-                <div class="instruction">
-                    <strong>Gestures:</strong><br>
-                    ✊ Fist: Explode<br>
-                    ✋ Open: Attract<br>
-                    👆 Point: Trail<br>
-                    🤙 Shaka: Change Colors
-                </div>
-            </div>
-        </div>
-        
-        <div id="loading">
-            <div class="spinner"></div>
-            <div>Loading Hand Tracking...</div>
-            <div style="font-size: 12px; margin-top: 10px;">Please allow camera access</div>
-        </div>
+<div class="player-card">
+    <h1>🎬 terabox · paste & play</h1>
+    <div class="sub">no login · no ads · just paste link and watch</div>
+
+    <!-- search row -->
+    <div class="search-area">
+        <input type="text" id="searchInput" placeholder="Paste Terabox link (teraboxapp.com, 1024terabox.com, ...)" value="">
+        <button class="btn" onclick="pasteFromClipboard()"><i class="fas fa-paste"></i> Paste</button>
+        <button class="btn btn-primary" onclick="searchVideo()"><i class="fas fa-search"></i> Search</button>
     </div>
 
-    <!-- Three.js and Handpose libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose@latest"></script>
-    
-    <script>
-        // Main application
-        class GestureParticleSystem {
-            constructor() {
-                this.particles = [];
-                this.particleCount = 2000;
-                this.currentTemplate = 'fireworks';
-                this.templates = {
-                    fireworks: { colorRange: 0xFF3366, shape: 'sphere', behavior: 'explosive' },
-                    heart: { colorRange: 0xFF1493, shape: 'heart', behavior: 'pulsing' },
-                    flower: { colorRange: 0x00FF7F, shape: 'flower', behavior: 'spiral' },
-                    saturn: { colorRange: 0xFFD700, shape: 'ring', behavior: 'orbital' },
-                    galaxy: { colorRange: 0x9370DB, shape: 'star', behavior: 'swirl' },
-                    vortex: { colorRange: 0x00BFFF, shape: 'point', behavior: 'vortex' }
-                };
-                
-                this.initThreeJS();
-                this.initHandTracking();
-                this.setupEventListeners();
-                this.createParticles();
-                this.animate();
-            }
-            
-            initThreeJS() {
-                // Scene setup
-                this.scene = new THREE.Scene();
-                this.scene.background = new THREE.Color(0x000011);
-                
-                // Camera setup
-                this.camera = new THREE.PerspectiveCamera(
-                    75,
-                    window.innerWidth / window.innerHeight,
-                    0.1,
-                    1000
-                );
-                this.camera.position.z = 50;
-                
-                // Renderer setup
-                this.renderer = new THREE.WebGLRenderer({
-                    canvas: document.getElementById('threeCanvas'),
-                    antialias: true
-                });
-                this.renderer.setSize(window.innerWidth, window.innerHeight);
-                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-                
-                // Lighting
-                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-                this.scene.add(ambientLight);
-                
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-                directionalLight.position.set(10, 10, 10);
-                this.scene.add(directionalLight);
-                
-                // Handle window resize
-                window.addEventListener('resize', () => {
-                    this.camera.aspect = window.innerWidth / window.innerHeight;
-                    this.camera.updateProjectionMatrix();
-                    this.renderer.setSize(window.innerWidth, window.innerHeight);
-                });
-            }
-            
-            async initHandTracking() {
-                try {
-                    // Get webcam stream
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: { width: 640, height: 480 }
-                    });
-                    
-                    const video = document.getElementById('webcam');
-                    video.srcObject = stream;
-                    
-                    // Load handpose model
-                    this.handposeModel = await handpose.load();
-                    
-                    // Hide loading screen
-                    document.getElementById('loading').style.display = 'none';
-                    
-                    // Start hand detection
-                    this.detectHands();
-                } catch (error) {
-                    console.error('Error accessing webcam:', error);
-                    alert('Could not access webcam. Please check permissions.');
+    <!-- error / loading -->
+    <div class="error" id="errorMessage"></div>
+    <div class="loading" id="loadingIndicator" style="display: none;">
+        <div class="spinner"></div> fetching video...
+    </div>
+
+    <!-- video output area (initially empty) -->
+    <div id="videoContainer" class="video-container"></div>
+
+    <!-- tiny note: exactly the same engine as flowvideoplayer -->
+    <div class="note">⚡ same backend as Flow Video Player · works with any Terabox link</div>
+</div>
+
+<!-- HLS.js for m3u8 streams -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<script>
+    (function() {
+        // ---------- core variables ----------
+        let activeHls = null;
+
+        // ---------- helpers ----------
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text && text.trim()) {
+                    document.getElementById('searchInput').value = text.trim();
                 }
-            }
-            
-            async detectHands() {
-                const video = document.getElementById('webcam');
-                
-                const detect = async () => {
-                    if (video.readyState === 4) {
-                        const predictions = await this.handposeModel.estimateHands(video);
-                        
-                        if (predictions.length > 0) {
-                            this.processHandData(predictions[0]);
-                        } else {
-                            document.getElementById('gestureStatus').textContent = 'No hand detected';
-                        }
-                    }
-                    
-                    requestAnimationFrame(detect);
-                };
-                
-                detect();
-            }
-            
-            processHandData(hand) {
-                // Get hand landmarks
-                const landmarks = hand.landmarks;
-                
-                // Calculate hand position (normalized to screen)
-                const handX = landmarks[0][0] / 640; // 0-1 range
-                const handY = 1 - (landmarks[0][1] / 480); // Invert Y
-                
-                // Map to 3D space
-                const targetX = (handX - 0.5) * 100;
-                const targetY = (handY - 0.5) * 100;
-                
-                // Detect gestures based on finger positions
-                this.detectGesture(landmarks);
-                
-                // Update particle system based on hand position
-                this.updateParticlesFromHand(targetX, targetY);
-                
-                // Update UI
-                document.getElementById('particleCount').textContent = this.particles.length;
-            }
-            
-            detectGesture(landmarks) {
-                // Simplified gesture detection based on finger positions
-                const fingerTips = [4, 8, 12, 16, 20]; // Thumb to pinky
-                const fingerBases = [2, 6, 10, 14, 18];
-                
-                let extendedFingers = 0;
-                let gesture = '';
-                
-                // Check each finger
-                for (let i = 0; i < 5; i++) {
-                    const tipY = landmarks[fingerTips[i]][1];
-                    const baseY = landmarks[fingerBases[i]][1];
-                    
-                    if (tipY < baseY) { // Finger is extended (Y is inverted)
-                        extendedFingers++;
-                    }
-                }
-                
-                // Determine gesture
-                if (extendedFingers === 0) {
-                    gesture = '✊ Fist';
-                    this.onFistGesture();
-                } else if (extendedFingers === 5) {
-                    gesture = '✋ Open Hand';
-                    this.onOpenHandGesture();
-                } else if (extendedFingers === 1 && landmarks[8][1] < landmarks[6][1]) {
-                    gesture = '👆 Pointing';
-                    this.onPointGesture();
-                } else if (extendedFingers === 2 && landmarks[8][1] < landmarks[6][1] && landmarks[12][1] < landmarks[10][1]) {
-                    gesture = '✌️ Peace';
-                    this.onPeaceGesture();
-                } else if (extendedFingers === 3) {
-                    gesture = '🤙 Shaka';
-                    this.onShakaGesture();
-                } else {
-                    gesture = 'Other Gesture';
-                }
-                
-                document.getElementById('gestureStatus').textContent = gesture;
-            }
-            
-            onFistGesture() {
-                // Explode particles
-                this.particles.forEach(p => {
-                    p.velocity.x = (Math.random() - 0.5) * 20;
-                    p.velocity.y = (Math.random() - 0.5) * 20;
-                    p.velocity.z = (Math.random() - 0.5) * 20;
-                    p.size = Math.random() * 2 + 1;
-                });
-            }
-            
-            onOpenHandGesture() {
-                // Attract particles to center
-                this.particles.forEach(p => {
-                    const dx = -p.mesh.position.x * 0.05;
-                    const dy = -p.mesh.position.y * 0.05;
-                    const dz = -p.mesh.position.z * 0.05;
-                    
-                    p.velocity.x = dx;
-                    p.velocity.y = dy;
-                    p.velocity.z = dz;
-                });
-            }
-            
-            onPointGesture() {
-                // Create trail effect
-                this.particles.forEach(p => {
-                    p.velocity.x += (Math.random() - 0.5) * 0.5;
-                    p.velocity.y += (Math.random() - 0.5) * 0.5;
-                    p.velocity.z += (Math.random() - 0.5) * 0.5;
-                });
-            }
-            
-            onPeaceGesture() {
-                // Change colors
-                const colors = [0xFF3366, 0x33FF66, 0x3366FF, 0xFF33FF, 0xFFFF33];
-                const newColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                this.particles.forEach(p => {
-                    p.mesh.material.color.setHex(newColor);
-                });
-            }
-            
-            onShakaGesture() {
-                // Switch to next template
-                const templates = Object.keys(this.templates);
-                const currentIndex = templates.indexOf(this.currentTemplate);
-                const nextIndex = (currentIndex + 1) % templates.length;
-                this.switchTemplate(templates[nextIndex]);
-            }
-            
-            updateParticlesFromHand(x, y) {
-                // Update particles based on hand position
-                const controlMode = document.getElementById('controlMode').value;
-                
-                if (controlMode === 'position') {
-                    // Create force field around hand position
-                    this.particles.forEach(p => {
-                        const dx = x - p.mesh.position.x;
-                        const dy = y - p.mesh.position.y;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-                        
-                        if (distance < 30) {
-                            const force = (30 - distance) * 0.01;
-                            p.velocity.x += dx * force;
-                            p.velocity.y += dy * force;
-                        }
-                    });
-                }
-            }
-            
-            createParticles() {
-                const geometry = new THREE.BufferGeometry();
-                const positions = new Float32Array(this.particleCount * 3);
-                const colors = new Float32Array(this.particleCount * 3);
-                
-                for (let i = 0; i < this.particleCount * 3; i += 3) {
-                    positions[i] = (Math.random() - 0.5) * 100;
-                    positions[i + 1] = (Math.random() - 0.5) * 100;
-                    positions[i + 2] = (Math.random() - 0.5) * 100;
-                    
-                    colors[i] = Math.random();
-                    colors[i + 1] = Math.random();
-                    colors[i + 2] = Math.random();
-                }
-                
-                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-                
-                const material = new THREE.PointsMaterial({
-                    size: 0.5,
-                    vertexColors: true,
-                    transparent: true,
-                    opacity: 0.8,
-                    sizeAttenuation: true
-                });
-                
-                this.particleSystem = new THREE.Points(geometry, material);
-                this.scene.add(this.particleSystem);
-                
-                // Store individual particle data
-                for (let i = 0; i < this.particleCount; i++) {
-                    this.particles.push({
-                        mesh: this.particleSystem,
-                        index: i,
-                        velocity: new THREE.Vector3(
-                            (Math.random() - 0.5) * 0.5,
-                            (Math.random() - 0.5) * 0.5,
-                            (Math.random() - 0.5) * 0.5
-                        ),
-                        originalPosition: new THREE.Vector3(
-                            positions[i * 3],
-                            positions[i * 3 + 1],
-                            positions[i * 3 + 2]
-                        ),
-                        phase: Math.random() * Math.PI * 2
-                    });
-                }
-            }
-            
-            switchTemplate(templateName) {
-                this.currentTemplate = templateName;
-                const template = this.templates[templateName];
-                
-                // Update UI
-                document.querySelectorAll('.template-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.dataset.template === templateName) {
-                        btn.classList.add('active');
-                    }
-                });
-                
-                // Update particles based on template
-                const positions = this.particleSystem.geometry.attributes.position.array;
-                
-                switch(templateName) {
-                    case 'heart':
-                        this.applyHeartShape(positions);
-                        break;
-                    case 'flower':
-                        this.applyFlowerShape(positions);
-                        break;
-                    case 'saturn':
-                        this.applySaturnShape(positions);
-                        break;
-                    case 'galaxy':
-                        this.applyGalaxyShape(positions);
-                        break;
-                    case 'vortex':
-                        this.applyVortexShape(positions);
-                        break;
-                    default: // fireworks
-                        this.applyFireworksShape(positions);
-                }
-                
-                this.particleSystem.geometry.attributes.position.needsUpdate = true;
-            }
-            
-            applyHeartShape(positions) {
-                for (let i = 0; i < this.particleCount * 3; i += 3) {
-                    const t = Math.random() * Math.PI * 2;
-                    const scale = 20;
-                    
-                    const x = 16 * Math.pow(Math.sin(t), 3);
-                    const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
-                    
-                    positions[i] = x * Math.random() * 0.5;
-                    positions[i + 1] = y * Math.random() * 0.3;
-                    positions[i + 2] = (Math.random() - 0.5) * 10;
-                }
-            }
-            
-            applyFlowerShape(positions) {
-                for (let i = 0; i < this.particleCount * 3; i += 3) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const radius = 10 + Math.sin(angle * 5) * 3;
-                    
-                    positions[i] = Math.cos(angle) * radius;
-                    positions[i + 1] = Math.sin(angle) * radius;
-                    positions[i + 2] = (Math.random() - 0.5) * 5;
-                }
-            }
-            
-            applySaturnShape(positions) {
-                for (let i = 0; i < this.particleCount * 3; i += 3) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const radius = 15 + (i % 3) * 5;
-                    
-                    if (i % 10 === 0) { // Planet core
-                        positions[i] = (Math.random() - 0.5) * 5;
-                        positions[i + 1] = (Math.random() - 0.5) * 5;
-                        positions[i + 2] = (Math.random() - 0.5) * 5;
-                    } else { // Rings
-                        positions[i] = Math.cos(angle) * radius;
-                        positions[i + 1] = (Math.random() - 0.5) * 2;
-                        positions[i + 2] = Math.sin(angle) * radius;
-                    }
-                }
-            }
-            
-            applyGalaxyShape(positions) {
-                for (let i = 0; i < this.particleCount * 3; i += 3) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const radius = Math.random() * 25;
-                    const spiral = Math.sin(angle * 5) * 3;
-                    
-                    positions[i] = Math.cos(angle) * (radius + spiral);
-                    positions[i + 1] = (Math.random() - 0.5) * 5;
-                    positions[i + 2] = Math.sin(angle) * (radius + spiral);
-                }
-            }
-            
-            applyVortexShape(positions) {
-                for (let i = 0; i < this.particleCount * 3; i += 3) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const radius = Math.random() * 20;
-                    const height = (Math.random() - 0.5) * 30;
-                    
-                    positions[i] = Math.cos(angle) * radius;
-                    positions[i + 1] = height;
-                    positions[i + 2] = Math.sin(angle) * radius;
-                }
-            }
-            
-            applyFireworksShape(positions) {
-                for (let i = 0; i < this.particleCount * 3; i += 3) {
-                    positions[i] = (Math.random() - 0.5) * 100;
-                    positions[i + 1] = (Math.random() - 0.5) * 100;
-                    positions[i + 2] = (Math.random() - 0.5) * 100;
-                }
-            }
-            
-            setupEventListeners() {
-                // Template switching
-                document.querySelectorAll('.template-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        this.switchTemplate(btn.dataset.template);
-                    });
-                });
-                
-                // Reset button
-                document.getElementById('resetBtn').addEventListener('click', () => {
-                    this.switchTemplate(this.currentTemplate);
-                });
-            }
-            
-            animate() {
-                requestAnimationFrame(() => this.animate());
-                
-                // Update particles based on current template
-                const positions = this.particleSystem.geometry.attributes.position.array;
-                const time = Date.now() * 0.001;
-                
-                for (let i = 0; i < this.particleCount; i++) {
-                    const idx = i * 3;
-                    const particle = this.particles[i];
-                    
-                    // Different behaviors based on template
-                    switch(this.currentTemplate) {
-                        case 'heart':
-                            positions[idx] += Math.sin(time + particle.phase) * 0.05;
-                            positions[idx + 1] += Math.cos(time + particle.phase) * 0.05;
-                            break;
-                        case 'flower':
-                            positions[idx] += Math.sin(time * 0.5 + particle.phase) * 0.1;
-                            positions[idx + 1] += Math.cos(time * 0.5 + particle.phase) * 0.1;
-                            break;
-                        case 'saturn':
-                            // Rotate rings
-                            const angle = Math.atan2(positions[idx + 2], positions[idx]);
-                            positions[idx] = Math.cos(angle + 0.01) * Math.sqrt(positions[idx]*positions[idx] + positions[idx+2]*positions[idx+2]);
-                            positions[idx + 2] = Math.sin(angle + 0.01) * Math.sqrt(positions[idx]*positions[idx] + positions[idx+2]*positions[idx+2]);
-                            break;
-                        case 'galaxy':
-                            // Spiral motion
-                            const galAngle = Math.atan2(positions[idx + 2], positions[idx]);
-                            positions[idx] = Math.cos(galAngle + 0.005) * Math.sqrt(positions[idx]*positions[idx] + positions[idx+2]*positions[idx+2]);
-                            positions[idx + 2] = Math.sin(galAngle + 0.005) * Math.sqrt(positions[idx]*positions[idx] + positions[idx+2]*positions[idx+2]);
-                            break;
-                        case 'vortex':
-                            // Vortex motion
-                            positions[idx + 1] -= 0.1;
-                            if (positions[idx + 1] < -15) positions[idx + 1] = 15;
-                            break;
-                        default: // fireworks
-                            positions[idx] += particle.velocity.x;
-                            positions[idx + 1] += particle.velocity.y;
-                            positions[idx + 2] += particle.velocity.z;
-                            
-                            // Slow down
-                            particle.velocity.multiplyScalar(0.99);
-                    }
-                    
-                    // Keep particles within bounds
-                    if (Math.abs(positions[idx]) > 50) particle.velocity.x *= -0.5;
-                    if (Math.abs(positions[idx + 1]) > 50) particle.velocity.y *= -0.5;
-                    if (Math.abs(positions[idx + 2]) > 50) particle.velocity.z *= -0.5;
-                }
-                
-                this.particleSystem.geometry.attributes.position.needsUpdate = true;
-                this.particleSystem.rotation.y += 0.001;
-                
-                // Render
-                this.renderer.render(this.scene, this.camera);
+            } catch (e) {
+                showError('Cannot read clipboard. Paste manually or allow permission.');
             }
         }
-        
-        // Initialize the application when page loads
-        window.addEventListener('DOMContentLoaded', () => {
-            new GestureParticleSystem();
-        });
-    </script>
+
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 4500);
+        }
+
+        function showLoading() {
+            document.getElementById('loadingIndicator').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+
+        // ---------- main search function (exactly same API as original) ----------
+        async function searchVideo() {
+            const input = document.getElementById('searchInput');
+            const url = input.value.trim();
+            if (!url) {
+                showError('Please paste a Terabox video URL');
+                return;
+            }
+
+            showLoading();
+            // hide any previous video
+            const container = document.getElementById('videoContainer');
+            container.innerHTML = '';
+
+            try {
+                const res = await fetch('https://flowvideoplayer.com/telegram/bot/search/video', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': 'fyCebxjwGNV8HiL1rrkZvA39QuiEDJgIkjjvqF0H',
+                        'app-secret-key': 'c43457c1b44eecde1ee0e447c963b8b3837054767fdce47e045044cbc8d665b6'
+                    },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await res.json();
+                hideLoading();
+
+                if (!data || data.error) {
+                    showError(data?.message || 'Unable to fetch video. Check link or try again.');
+                    return;
+                }
+
+                // response structure: { data: [video object] or array of videos }
+                let videoItem = null;
+                if (Array.isArray(data.data)) {
+                    if (data.data.length === 0) {
+                        showError('No video found at this link.');
+                        return;
+                    }
+                    // SIMPLE: just take the first video, ignore related grid (no extra UI)
+                    videoItem = data.data[0];
+                } else {
+                    videoItem = data.data; // single object
+                }
+
+                if (!videoItem) {
+                    showError('Invalid response from server.');
+                    return;
+                }
+
+                // extract stream URL (support both stream_final_url and stream_url)
+                const streamUrl = videoItem.stream_final_url || videoItem.stream_url;
+                if (!streamUrl) {
+                    showError('No playable stream found.');
+                    return;
+                }
+
+                // display video player with info
+                displayVideo(streamUrl, videoItem.file_name || 'Terabox video', videoItem.file_size || 'unknown');
+
+                // clear input if you like (optional)
+                // input.value = '';  // (keeping it, but can be left as is)
+
+            } catch (e) {
+                hideLoading();
+                showError('Network error or server unreachable.');
+                console.warn(e);
+            }
+        }
+
+        // ---------- render video player (no download buttons, no extra fluff) ----------
+        function displayVideo(url, title, size) {
+            const container = document.getElementById('videoContainer');
+            // clean up any previous hls instance
+            if (activeHls) {
+                activeHls.destroy();
+                activeHls = null;
+            }
+
+            const videoId = 'simple-player-' + Date.now(); // unique but we only have one
+
+            const html = `
+                <div class="video-item">
+                    <video id="${videoId}" controls playsinline style="width:100%; background:#000;"></video>
+                    <div class="video-info">
+                        <h3>${escapeHtml(title)}</h3>
+                        <div class="meta-row">
+                            <span><i class="fas fa-cloud"></i> size: ${escapeHtml(size)}</span>
+                            <span id="duration-${videoId}"><i class="far fa-clock"></i> duration: —</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+
+            const videoElement = document.getElementById(videoId);
+            if (!videoElement) return;
+
+            // If HLS supported
+            if (Hls.isSupported()) {
+                const hls = new Hls({
+                    enableWorker: true,
+                    lowLatencyMode: false,
+                    maxBufferLength: 60,
+                    backBufferLength: 20,
+                    maxBufferHole: 0.5,
+                    maxSeekHole: 2
+                });
+                activeHls = hls;
+                hls.loadSource(url);
+                hls.attachMedia(videoElement);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    videoElement.play().catch(() => {}); // autoplay may be blocked, but fine
+                });
+                hls.on(Hls.Events.ERROR, (err, data) => {
+                    // silent fail (already handled by video element fallback)
+                });
+            } 
+            // fallback for Safari / native HLS
+            else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+                videoElement.src = url;
+                videoElement.play().catch(() => {});
+            } 
+            else {
+                // last resort: try to load as plain video
+                videoElement.src = url;
+            }
+
+            // update duration when metadata loaded
+            videoElement.addEventListener('loadedmetadata', () => {
+                const d = videoElement.duration;
+                if (!isNaN(d)) {
+                    const mins = Math.floor(d / 60);
+                    const secs = Math.floor(d % 60).toString().padStart(2, '0');
+                    const durSpan = document.getElementById(`duration-${videoId}`);
+                    if (durSpan) durSpan.innerHTML = `<i class="far fa-clock"></i> duration: ${mins}:${secs}`;
+                }
+            });
+        }
+
+        // tiny helper to escape text (prevent XSS from filenames)
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // expose functions globally for onclick
+        window.pasteFromClipboard = pasteFromClipboard;
+        window.searchVideo = searchVideo;
+    })();
+</script>
+
+<!-- no extra sections, no ads, no related, no footer — exactly as requested: simple paste & play -->
 </body>
 </html>
